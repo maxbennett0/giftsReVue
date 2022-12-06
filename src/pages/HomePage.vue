@@ -1,44 +1,64 @@
 <template>
-  <div class="home flex-grow-1 d-flex flex-column align-items-center justify-content-center">
-    <div class="home-card p-5 bg-white rounded elevation-3">
-      <img
-        src="https://bcw.blob.core.windows.net/public/img/8600856373152463"
-        alt="CodeWorks Logo"
-        class="rounded-circle"
-      >
-      <h1 class="my-5 bg-dark text-white p-3 rounded text-center">
-        Vue 3 Starter
-      </h1>
+  <!-- <div class="container-fluid">
+    <section class="row p-2">
+      <div class="col-md-3 col-4 card elevation-3">
+        <div>
+          <div @click="openGifts">
+            <img class="img-card"
+              src="https://creazilla-store.fra1.digitaloceanspaces.com/cliparts/63277/gift-clipart-xl.png" alt="">
+            <h1 class="text-center">Gift Tag</h1>
+            <h6 class="text-center">Opened?</h6>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div> -->
+  <section class="container-fluid">
+    <div class="row">
+      <GiftForm />
     </div>
-  </div>
+    <div class="row">
+      <GiftCard v-for="g in gifts" :key="g.id" :gift="g" />
+    </div>
+  </section>
 </template>
 
 <script>
+
+import { logger } from "../utils/Logger.js";
+import { onMounted, computed } from "vue"
+import { giftsService } from "../services/GiftsService.js"
+import Pop from "../utils/Pop.js";
+import GiftCard from "../components/GiftCard.vue";
+import { AppState } from "../AppState.js";
+import GiftForm from "../components/GiftForm.vue";
+
 export default {
   setup() {
-    return {}
-  }
+    onMounted(() => {
+      getGifts();
+    });
+    async function getGifts() {
+      try {
+        await giftsService.getGifts();
+      }
+      catch (error) {
+        logger.log(error);
+        Pop.error(error);
+      }
+    }
+    return {
+      gifts: computed(() => AppState.gifts)
+    };
+  },
+  components: { GiftCard, GiftForm }
 }
 </script>
 
-<style scoped lang="scss">
-.home {
-  display: grid;
-  height: 80vh;
-  place-content: center;
-  text-align: center;
-  user-select: none;
-
-  .home-card {
-    width: 50vw;
-
-    >img {
-      height: 200px;
-      max-width: 200px;
-      width: 100%;
-      object-fit: contain;
-      object-position: center;
-    }
-  }
+<style lang="scss">
+.img-card {
+  width: 100%;
+  height: 35vh;
+  object-fit: cover;
 }
 </style>
